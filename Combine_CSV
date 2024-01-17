@@ -1,6 +1,9 @@
 import os
 import pandas as pd
-
+import csv
+#
+# python script_name.py > output.csv
+#
 def get_files_from_directory(directory_path):
     try:
         # Get the list of files in the specified directory
@@ -11,17 +14,16 @@ def get_files_from_directory(directory_path):
         return []
     
 
-
-#def combine_csv(file,master):
-
-
-
-def main(folder, output_file):
+def main(folder, output_file, master_file):
 
     # Load files
     files = get_files_from_directory(folder)
     if files:
-        
+
+        # create/overwrite blank 
+        create_csv([['ips']], output_file)
+        print (f"file,year,month,day,hour,ip_observed,running_tally")
+
         for file in files:
             f = str(folder+"/"+file)
             df = pd.read_csv(f)
@@ -44,12 +46,20 @@ def main(folder, output_file):
             tally = len(df_tally)
 
             print(f"{f},2024,01,d,h,{num_lines},{tally}")
-
+            
     else: print("No files found in the specified directory.")
+    print(f"CSV file created successfully: {output_file}")
 
 
+# Create CSVs
+def create_csv(data, output_file):
+    # Write the data to a CSV file
+    os.remove(output_file)
+    with open(output_file, 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerows(data)
+    print(f"CSV file created successfully: {output_file}")
 
 
 if __name__ == "__main__":
-    print(f"file,year,month,day,hour,ip_observed,running_tally\n")
-    main("splunk_dump", "anomali.csv")
+    main("splunk_dump", "anomali.csv", "calculated_outputs.csv")
